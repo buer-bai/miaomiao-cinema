@@ -1,27 +1,31 @@
 <template>
      <div class="cinema_body">
-        <ul>
-            <li v-for="(v,i) in cinemas" :key="i">
-                <div>
-                    <span>{{v.nm}}</span>
-                    <span class="q">
-                        <span class="price">{{v.sellPrice}}</span>
-                         元起
-                    </span>
-                </div>
-                <div class="address">
-                    <span>{{v.addr}}</span>
-                    <span>{{v.distance}}</span>
-                </div>
-                <div class="card">
-                   <div v-for="(item,key) in v.tag" :key="key"
-                   :class="key | classCard(key)" 
-                   v-if='item === 1'>
-                       {{key | formatCard(key)}}
+         <Loading v-if="isLoading"/>
+        <Scroll v-else :hendleScroll='fangf1' :hendleTouchEnd='fangf2'>
+            <ul>
+                <li v-if='updata' class="center">{{updata}}</li>
+                <li v-for="(v,i) in cinemas" :key="i">
+                    <div>
+                        <span>{{v.nm}}</span>
+                        <span class="q">
+                            <span class="price">{{v.sellPrice}}</span>
+                            元起
+                        </span>
                     </div>
-                </div>
-            </li>
-        </ul>
+                    <div class="address">
+                        <span>{{v.addr}}</span>
+                        <span>{{v.distance}}</span>
+                    </div>
+                    <div class="card">
+                    <div v-for="(item,key) in v.tag" :key="key"
+                    :class="key | classCard(key)" 
+                    v-if='item === 1'>
+                        {{key | formatCard(key)}}
+                        </div>
+                    </div>
+                </li>
+            </ul>
+         </Scroll>
     </div>
 </template>
 
@@ -30,13 +34,21 @@ export default {
     name:'list1',
     data(){
         return {
-            cinemas:[]
+            cinemas:[],
+            updata:'',
+            isLoading:true,
+            preId:''
         }
     },
-    mounted(){
-        this.axios.get('/api/cinemaList?cityId=10').then((res)=>{
+    activated(){
+        let id = this.$store.state.City.id;
+        if(this.preId === id){return;}
+         this.isLoading = true;
+        this.axios.get('/api/cinemaList?cityId='+id).then((res)=>{
             if(res.data.msg === 'ok'){
-                this.cinemas = res.data.data.cinemas
+                this.cinemas = res.data.data.cinemas;
+                this.isLoading = false;
+                this.preId = id;
             }
         })
     },
@@ -93,6 +105,28 @@ export default {
             }
             return '';
         }
+    },
+    methods:{
+         fangf1(pos){
+             if(pos.y>30){
+                this.updata = '数据正在更新中'
+            }
+        },
+        fangf2(pos){
+            if(pos.y>30){
+                this.axios.get('/api/movieOnInfoList?cityId=12').then((res)=>{
+                    let msg = res.data.msg;
+                    if(msg === 'ok'){
+                        this.updata = '数据更新成功';
+                        setTimeout(()=>{
+                            this.movieList = res.data.data.movieList;
+                            this.updata = '';
+                        },500)
+                        
+                    }
+                })   
+            }
+        }
     }
 
 }
@@ -112,6 +146,10 @@ export default {
     text-overflow: ellipsis;
     width: 75%;
     display: block;    
+}
+.center{
+    text-align: center;
+    color: #666;
 }
 .cinema_body .address span:nth-of-type(2){ float:right; }
 .cinema_body .card{ display: flex;}

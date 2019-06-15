@@ -36,7 +36,8 @@ export default {
     watch:{
         search(val){
             this.cancelRequest();
-           this.axios.get('/api/searchList?cityId=10&kw='+val,{
+            let id = this.$store.state.City.id;
+           this.axios.get('/api/searchList?cityId='+id+'&kw='+val,{
                cancelToken: new this.axios.CancelToken((c)=>{
                     this.source = c;
                 })
@@ -48,7 +49,7 @@ export default {
                    console.log(this.movieList)
                }
            }).catch((err) => {
-                if (axios.isCancel(err)) {
+                if (this.axios.isCancel(err)) {
                     console.log('Rquest canceled', err.message); //请求如果被取消，这里是返回取消的message
                 } else {
                     //handle error
@@ -79,7 +80,19 @@ export default {
 .search_body .search_result .img{ width: 60px; float:left; }
 .search_body .search_result .img img{ width: 100%; }
 .search_body .search_result .info{ float:left; margin-left: 15px; flex:1;}
-.search_body .search_result .info p{ height: 22px; display: flex; line-height: 22px; font-size: 12px;}
-.search_body .search_result .info p:nth-of-type(1) span:nth-of-type(1){ font-size: 18px; flex:1; }
+.search_body .search_result .info p{ 
+    height: 22px;
+    display: flex; 
+    line-height: 22px; 
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* width: 75%; */
+    white-space: nowrap;
+}
+.search_body .search_result .info p:nth-of-type(1) span:nth-of-type(1){ 
+    font-size: 18px; 
+    flex:1; 
+}
 .search_body .search_result .info p:nth-of-type(1) span:nth-of-type(2){ font-size: 16px; color:#fc7103;}
 </style>

@@ -6,6 +6,11 @@ import axios from 'axios'
 
 Vue.prototype.axios = axios
 
+import Scroll from './components/downUpdate'
+Vue.component('Scroll',Scroll)
+import Loading from './components/loading'
+Vue.component('Loading',Loading)
+
 Vue.filter('setWH',(url,arg)=>{
   return url.replace(/w\.h/,arg);
 })

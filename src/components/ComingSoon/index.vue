@@ -1,39 +1,74 @@
 <template>
 <div class="movie_body">
-    <ul>
-        <li v-for="(v,i) in comingList" :key="i">
-            <div class="pic_show">
-                <img :src="v.img | setWH('128.180')" alt="">
-            </div>
-            <div class="info_list">
-                <h2>{{v.nm}} <img v-if='v.version' src="@/assets/maxs.png"/></h2>
-                <p><span class="person">{{v.wish}}</span>人想看</p>
-                <p>主演：{{v.star}}</p>
-                <p>{{v.rt}}上映</p>
-            </div>
-            <div class="btn_pre">
-                预售
-            </div>
-        </li>
-    </ul>
+    <Loading v-if="isLoading"/>
+    <Scroll v-else :hendleScroll='fangf1' :hendleTouchEnd='fangf2'>
+        <ul>
+            <li v-if='updata' class="center">{{updata}}</li>
+            <li v-for="(v,i) in comingList" :key="i">
+                <div class="pic_show">
+                    <img :src="v.img | setWH('128.180')" alt="">
+                </div>
+                <div class="info_list">
+                    <h2>{{v.nm}} <img v-if='v.version' src="@/assets/maxs.png"/></h2>
+                    <p><span class="person">{{v.wish}}</span>人想看</p>
+                    <p>主演：{{v.star}}</p>
+                    <p>{{v.rt}}上映</p>
+                </div>
+                <div class="btn_pre">
+                    预售
+                </div>
+            </li>
+        </ul>
+    </Scroll>
 </div>
     
 </template>
 
 <script>
+import { truncate } from 'fs';
 export default {
     name:'comingSoon',
     data(){
         return {
-            comingList:[]
+            comingList:[],
+            updata:'',
+            isLoading:true,
+            preId:''
         }
     },
-    mounted() {
-        this.axios.get('/api/movieComingList?cityId=10').then((res)=>{
+    activated() {
+        let id = this.$store.state.City.id;
+        if(this.preId === id){return;}
+        this.isLoading = true;
+        this.axios.get('/api/movieComingList?cityId=' + id).then((res)=>{
             if(res.data.msg === 'ok'){
                 this.comingList = res.data.data.comingList;
+                this.isLoading = false;
+                this.preId = id;
             }
         })
+    },
+    methods:{
+         fangf1(pos){
+             if(pos.y>30){
+                this.updata = '数据正在更新中'
+            }
+        },
+        fangf2(pos){
+            if(pos.y>30){
+                this.axios.get('/api/movieOnInfoList?cityId=12').then((res)=>{
+                    let msg = res.data.msg;
+                    if(msg === 'ok'){
+                        this.updata = '数据更新成功';
+                        setTimeout(()=>{
+                            this.movieList = res.data.data.movieList;
+                            this.updata = '';
+                        },500)
+                        
+                    }
+                })   
+            }
+        }
     }
 
 }
