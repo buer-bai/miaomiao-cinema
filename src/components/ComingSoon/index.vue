@@ -4,7 +4,7 @@
     <Scroll v-else :hendleScroll='fangf1' :hendleTouchEnd='fangf2'>
         <ul>
             <li v-if='updata' class="center">{{updata}}</li>
-            <li v-for="(v,i) in comingList" :key="i">
+            <li v-for="(v,i) in comingList" :key="i" @touchstart='toDetail(v.id)'>
                 <div class="pic_show">
                     <img :src="v.img | setWH('128.180')" alt="">
                 </div>
@@ -68,6 +68,9 @@ export default {
                     }
                 })   
             }
+        },
+        toDetail(id){
+              this.$router.push('/movie/detail/2/'+id);
         }
     }
 
