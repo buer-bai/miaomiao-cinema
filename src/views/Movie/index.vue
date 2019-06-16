@@ -20,6 +20,7 @@
                 </keep-alive>  
             </div>
         <Footers/>
+        <router-view name="detai"/>
     </div>
 </template>
 

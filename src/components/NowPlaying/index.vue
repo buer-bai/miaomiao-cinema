@@ -4,7 +4,7 @@
         <Scroll v-else :hendleScroll='fangf1' :hendleTouchEnd='fangf2'>
             <ul>
                 <li v-if='updata' class="center">{{updata}}</li>
-                <li v-for="(v,i) in movieList" :key="i" @tap='toDetail'>
+                <li v-for="(v,i) in movieList" :key="i" @tap='toDetail(v.id)'>
                     <div class="pic_show">
                         <img :src="v.img | setWH('128.180')" alt="这是一张图片">
                     </div>
@@ -76,8 +76,9 @@ export default {
         })
     },
     methods:{
-        toDetail(){
-            console.log('tap事件')
+        toDetail(id){
+            this.$router.push('/movie/detail/1/'+id);
+            // console.log(id)
         },
         fangf1(pos){
              if(pos.y>30){
@@ -107,6 +108,7 @@ export default {
 .movie_body{
     flex: 1;
     overflow: auto;
+    animation: 1s slideMove;
     ul{
         margin: 0 12px;
         overflow: hidden;
@@ -177,6 +179,14 @@ export default {
         .btn_pre{
             background: #3c9fe6;
         }
+    }
+}
+@keyframes slideMove{
+    0%{
+        transform: translateX(-100%)
+    }
+    100%{
+        transform: translateX(0)
     }
 }
 </style>
